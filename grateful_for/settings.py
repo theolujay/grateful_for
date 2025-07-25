@@ -2,6 +2,7 @@
 Django settings for grateful_for project.
 """
 
+from django.core.exceptions import ImproperlyConfigured
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -209,15 +210,22 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Use console backend for development to print emails to the terminal
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+# --- Email Configuration ---
+# For development, you can use the console backend to see emails in the terminal:
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"  # Use SMTP for real emails
+EMAIL_HOST=os.getenv("EMAIL_HOST")
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD=os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL=os.getenv("DEFAULT_FROM_EMAIL")
+# Ensure required SMTP settings are present if that backend is used
+if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend" and not all([EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD]):
+    raise ImproperlyConfigured(
+        "When using the SMTP email backend, you must set EMAIL_HOST, EMAIL_HOST_USER, and EMAIL_HOST_PASSWORD in your .env file."
+    )
 EMAIL_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/email/confirm/"
 PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/password/reset/confirm/"
 GOOGLE_CALLBACK_URL = f"{BASE_URL}/api/v1/auth/google/callback/"

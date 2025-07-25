@@ -12,10 +12,10 @@
   - [Journal Endpoints](#journal-endpoints)
   - [Community Endpoints](#community-endpoints)
   - [User Endpoints](#user-endpoints)
-  - [Versioning](#versioning)
-  - [Interactive Documentation](#interactive-documentation)
-  - [Support](#support)
-  - [Changelog](#changelog)
+- [Versioning](#versioning)
+- [Interactive Documentation](#interactive-documentation)
+- [Support](#support)
+- [Changelog](#changelog)
 
 ---
 
