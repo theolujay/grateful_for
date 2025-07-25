@@ -2,10 +2,15 @@
 Serializers for converting model instances to and from JSON representations.
 """
 
+from django.urls import reverse
 from django.db import transaction
 
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.serializers import PasswordResetSerializer as BasePasswordResetSerializer
+from allauth.account.utils import user_pk_to_url_str
+
+from grateful_for import settings
 
 from .models import (
     CustomUser,
@@ -98,3 +103,24 @@ class CustomRegisterSerializer(RegisterSerializer):
         )
         user.save()
         return user
+
+
+def namespaced_password_reset_url_generator(request, user, temp_key):
+    """
+    Custom URL generator for password reset that respects the 'v1' namespace.
+    """
+    path = reverse(
+        "v1:password_reset_confirm",
+        args=[user_pk_to_url_str(user), temp_key],
+    )
+    # Use settings.BASE_URL to construct the absolute URI.
+    # This avoids issues with reverse proxies or clients (like Postman)
+    # sending requests over HTTPS to the dev server, which only supports HTTP.
+    return f"{settings.BASE_URL}{path}"
+
+
+class CustomPasswordResetSerializer(BasePasswordResetSerializer):
+    def get_email_options(self):
+        return {
+            "url_generator": namespaced_password_reset_url_generator,
+        }

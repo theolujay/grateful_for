@@ -187,13 +187,15 @@ def logout_api(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 # @permission_classes([HasAPIKey])
 def email_confirm_redirect(request, key):
     """Redirect to frontend email confirmation page."""
     return HttpResponseRedirect(f"{settings.EMAIL_CONFIRM_REDIRECT_BASE_URL}{key}/")
 
 
-@api_view(["POST"])
+@api_view(["GET"])
+@permission_classes([AllowAny])
 def password_reset_confirm_redirect(request, uidb64, token):
     """Redirect to frontend password reset confirmation page."""
     return HttpResponseRedirect(

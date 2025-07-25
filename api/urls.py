@@ -26,8 +26,8 @@ urlpatterns = [
     path("", root.api_root, name="api_root"),
     path("auth/login/", auth.login_api, name="api_login"),
     path("auth/logout/", auth.logout_api, name="api_logout"),
-    path("auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("auth/token/", TokenObtainPairView.as_view(), name="api_token_obtain_pair"),
+    path("auth/token/refresh/", TokenRefreshView.as_view(), name="api_token_refresh"),
     path(
         "auth/registration/",
         registration.CustomRegisterView.as_view(),
@@ -37,27 +37,32 @@ urlpatterns = [
     path(
         "auth/registration/resend-email/",
         ResendEmailVerificationView.as_view(),
-        name="rest_resend_email",
+        name="api_resend_email",
     ),
     path(
         "auth/registration/verify-email/",
         VerifyEmailView.as_view(),
-        name="rest_verify_email",
+        name="api_verify_email",
     ),
     path(
-        "auth/password/reset/", PasswordResetView.as_view(), name="rest_password_reset"
+        "auth/registration/confirm-email/<str:key>/",
+        auth.email_confirm_redirect,
+        name="account_confirm_email",
+    ),
+    path(
+        "auth/password/reset/", PasswordResetView.as_view(), name="api_password_reset"
     ),
     path(
         "auth/password/reset/confirm/<str:uidb64>/<str:token>/",
         auth.password_reset_confirm_redirect,
-        name="rest_password_reset_confirm",
+        name="password_reset_confirm",
     ),
     path(
         "auth/password/reset/confirm/",
         PasswordResetConfirmView.as_view(),
-        name="rest_password_reset_confirm_api",
+        name="api_password_reset_confirm",
     ),
-    path("auth/google/", auth.GoogleLoginView.as_view(), name="google_login"),
+    path("auth/google/", auth.GoogleLoginView.as_view(), name="api_google_login"),
     path("journal/entries/", journal.journal_entry, name="api_journal_entries"),
     path(
         "journal/entries/<int:entry_id>/",

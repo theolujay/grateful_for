@@ -1,5 +1,7 @@
-from datetime import date
+from datetime import timedelta
 
+from django.utils import timezone
+from django.utils import timezone
 from django.db import models
 
 from rest_framework.decorators import api_view, permission_classes
@@ -24,7 +26,7 @@ def journal_entry(request):
         entries = JournalEntry.objects.filter(user=request.user).order_by("-created_at")
         return paginate_queryset(entries, request, JournalEntryListSerializer)
 
-    today = date.today()
+    today = timezone.now().date()
     user_entries_today = JournalEntry.objects.filter(
         user=request.user, created_at__date=today
     )
@@ -87,28 +89,36 @@ def entry_analytics(request):
     """
     Get analytics/stats about user's journal entries
     """
-    user_entries = JournalEntry.objects.filter(user=request.user)
+    user = request.user
+    today = timezone.now().date()
 
-    # Calculate stats
-    total_entries = user_entries.count()
-    entries_this_month = user_entries.filter(
-        created_at__month=date.today().month, created_at__year=date.today().year
-    ).count()
-
-    # Streak calculation (consecutive days with entries)
+    # --- Streak Calculation ---
+    entry_dates = set(
+        JournalEntry.objects.filter(user=user)
+        .values_list("created_at__date", flat=True)
+        .distinct()
+    )
     current_streak = 0
-    check_date = date.today()
-
-    while user_entries.filter(created_at__date=check_date).exists():
+    check_date = today
+    while check_date in entry_dates:
         current_streak += 1
-        check_date = check_date.replace(day=check_date.day - 1)
+        check_date -= timedelta(days=1)
+
+    # --- Aggregate Stats Calculation ---
+    stats = JournalEntry.objects.filter(user=user).aggregate(
+        total_entries=models.Count("id"),
+        entries_this_month=models.Count(
+            "id", filter=models.Q(created_at__year=today.year, created_at__month=today.month)
+        ),
+        entries_today=models.Count("id", filter=models.Q(created_at__date=today)),
+    )
 
     return Response(
         {
-            "total_entries": total_entries,
-            "entries_this_month": entries_this_month,
+            "total_entries": stats["total_entries"],
+            "entries_this_month": stats["entries_this_month"],
             "current_streak": current_streak,
-            "entries_today": user_entries.filter(created_at__date=date.today()).count(),
+            "entries_today": stats["entries_today"],
         }
     )
 
@@ -119,8 +129,9 @@ def entry_calendar(request):
     """
     Get calendar view of entries for a specific month/year
     """
-    year = request.GET.get("year", date.today().year)
-    month = request.GET.get("month", date.today().month)
+    today = timezone.now().date()
+    year = request.GET.get("year", today.year)
+    month = request.GET.get("month", today.month)
 
     try:
         year = int(year)

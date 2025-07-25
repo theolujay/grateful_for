@@ -1,0 +1,161 @@
+# Grateful For API
+
+A RESTful API for a digital journaling application designed to encourage gratitude and mindful reflection.
+
+## Overview
+
+This project provides the backend services for "Grateful For". It allows users to create, manage, and reflect on their journal entries, with features for community sharing and personal analytics. The API is built with Django and Django REST Framework, using JSON Web Tokens (JWT) for authentication.
+
+## Features
+
+- **User Authentication**: Secure registration, login (email/password and Google OAuth2), and session management using JWT.
+- **Journal Management**: Full CRUD (Create, Read, Update, Delete) operations for journal entries.
+- **Daily Entry Limit**: Users can create up to three entries per day to encourage thoughtful posts.
+- **Personal Analytics**: Track journaling habits, including total entries, monthly counts, and consecutive day streaks.
+- **Calendar View**: Visualize entry history on a monthly calendar.
+- **Community Feed**: Anonymized, randomized feed of public journal entries from the community.
+- **User Profiles**: Manage user account information and view a personal dashboard.
+- **Security**: Includes rate limiting on login attempts to prevent brute-force attacks.
+
+## Prerequisites
+
+- Python 3.11+
+- Django 5+
+- A PostgreSQL database is recommended for production.
+
+## Setup and Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/theolujay/grateful_for
+    cd grateful_for
+    ```
+
+2.  **Create and activate a virtual environment:**
+    ```bash
+    python -m venv .venv
+    # On macOS/Linux
+    source .venv/bin/activate
+    # On Windows
+    .venv\Scripts\activate
+    ```
+
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Configure environment variables:**
+    Create a `.env` file in the project root. This file should contain sensitive information and environment-specific settings. Refer to `settings.py` for all required variables.
+    ```env
+    SECRET_KEY='your-super-secret-key'
+    DEBUG=True # Set to False in production
+    DATABASE_URL='postgres://user:password@host:port/dbname' # Or sqlite:///db.sqlite3 for local dev
+    EMAIL_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/email/confirm/' # Note the trailing slash
+    PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/password/reset/confirm/' # Note the trailing slash
+    # ... other settings for email, Google OAuth, etc.
+    ```
+
+5.  **Run database migrations:**
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+6.  **Create a superuser (for admin access):**
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+7.  **Run the development server:**
+    ```bash
+    python manage.py runserver
+    ```
+    The API will be available at `http://127.0.0.1:8000/`, with the API root at `http://127.0.0.1:8000/api/v1/`.
+
+## API Endpoints
+
+The API root is discoverable at `/api/v1/` and provides a list of all available endpoints. All data is exchanged in JSON format.
+
+### Authentication
+
+Handles user accounts, authentication tokens, and account management flows.
+
+- `POST /api/v1/auth/registration/`: Create a new user account.
+- `POST /api/v1/auth/login/`: Authenticate with email and password to receive JWTs.
+- `POST /api/v1/auth/logout/`: Blacklist a refresh token to log out.
+- `POST /api/v1/auth/token/refresh/`: Refresh an expired access token.
+- `POST /api/v1/auth/google/`: Authenticate with access token from Google OAuth2 to receive JWTs.
+- `POST /api/v1/auth/password/reset/`: Request a password reset email.
+- `GET /api/v1/auth/password/reset/confirm/<uid>/<token>/`: (From email link) Redirects to frontend to complete reset.
+- `POST /api/v1/auth/password/reset/confirm/`: (From frontend) Submits the new password.
+- `POST /api/v1/auth/registration/resend-email/`: Resend the email verification link.
+- `GET /api/v1/auth/registration/verify-email/<key>/`: (From email link) Redirects to frontend to complete verification.
+- `POST /api/v1/auth/registration/verify-email/`: (From frontend) Submits the verification key.
+
+### Journal
+
+Endpoints for managing journal entries. All require authentication.
+
+- `GET, POST /api/v1/journal/entries/`: List all of the user's entries or create a new one.
+- `GET, PATCH, DELETE /api/v1/journal/entries/<entry_id>/`: Retrieve, update, or delete a specific entry.
+- `GET /api/v1/journal/analytics/`: Get statistics about the user's entries.
+- `GET /api/v1/journal/calendar/`: Get a calendar view of entries for a given month and year.
+
+### Community
+
+Endpoints for community features. All require authentication.
+
+- `GET /api/v1/community/feed/`: Get a randomized feed of public journal entries. Supports `?period=today|week` and `?refresh=true` query parameters.
+
+### User
+
+Endpoints for user-specific data. All require authentication.
+
+- `GET /api/v1/dashboard/`: Get dashboard data including recent entries and stats.
+- `GET, PATCH /api/v1/account-management/`: Retrieve or update the authenticated user's account information.
+
+---
+
+## API Information
+
+### Versioning
+
+The API is currently at version `v1`. All endpoints are prefixed with `/api/v1/`.
+
+-   **Backwards Compatibility**: We strive to make only backwards-compatible changes, such as adding new endpoints or new optional properties to existing responses.
+-   **Breaking Changes**: Any backwards-incompatible changes will result in a new API version (e.g., `/api/v2/`).
+-   **Deprecation**: Deprecated endpoints will be supported for at least 6 months after a new version is released.
+
+### Interactive Documentation
+
+You can explore the API interactively using the built-in documentation interfaces when the server is running:
+
+-   **Swagger UI**: `/swagger/`
+-   **ReDoc**: `/redoc/`
+
+For example, on a local development server, you would visit `http://127.0.0.1:8000/swagger/`.
+
+### Support
+
+For technical support, questions, or feedback:
+
+-   **Email:** `olujay.dev@gmail.com`
+-   **Discord:** `@olujay`
+
+We aim to respond to support requests within 48 hours.
+
+### Changelog
+
+**Version 1.0.0 (Current)**
+-   Initial public release of the API.
+-   Core features for user management, journaling, and community interaction.
+
+<!-- ## Running Tests
+
+*(This section can be filled out once tests are added to the project.)*
+
+```bash
+# Example command
+python manage.py test
+``` -->

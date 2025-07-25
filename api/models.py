@@ -49,7 +49,7 @@ class CustomUser(AbstractUser):
 class JournalEntry(models.Model):
     content = models.TextField()
     user = models.ForeignKey("CustomUser", on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to="journal_photos/", blank=True, null=True)
+    photo = models.ImageField(upload_to="media/journal_photos/", blank=True, null=True)
     public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

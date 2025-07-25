@@ -1,8 +1,6 @@
 """
 Dashboard and account management views for users.
 """
-
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -49,74 +47,35 @@ def user_dashboard_api(request):
 
 class AccountManagementView(APIView):
     """
-    Retrieve or update user account and profile information.
+    Retrieve or update the authenticated user's account information.
 
-    - GET: Retrieve account and profile information.
-    - PUT/PATCH: Update account and profile.
-    - DELETE not supported here (ownership check implied).
-
-    Only authenticated users can manage their own accounts.
-    Staff users with appropriate permissions can manage other users' accounts.
+    - GET: Retrieve the current user's profile information.
+    - PATCH: Update the current user's profile information.
     """
 
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request, user_id=None):
+    def get(self, request):
         """
-        Retrieve the account and profile data of the target user.
-
-        If `user_id` is not provided, retrieves the current user's account data.
-
-        Args:
-            user_id (UUID, optional): ID of the user to fetch.
-
-        Returns:
-            JSON response with user profile data.
+        Retrieve the profile data of the currently authenticated user.
         """
-        user = self._get_target_user(request, user_id)
-        if isinstance(user, Response):
-            return user
-
-        serializer = UserSerializer(user)
+        serializer = UserSerializer(request.user)
         return Response(
             {
                 "profile": serializer.data,
             }
         )
 
-    def patch(self, request, user_id=None):
+    def patch(self, request):
         """
-        Partially update user data.
-
-        Args:
-            user_id (UUID, optional): ID of the user to update.
-
-        Returns:
-            JSON response with updated user data.
+        Partially update the authenticated user's data.
         """
-        return self._update_account(request, partial=True, user_id=user_id)
-
-    def _update_account(self, request, partial=False, user_id=None):
-        """
-        Handles the update logic for user data.
-
-        Args:
-            partial (bool): Whether the update is partial.
-            user_id (UUID, optional): Target user ID.
-
-        Returns:
-            JSON response or error message.
-        """
-        user = self._get_target_user(request, user_id)
-        if isinstance(user, Response):
-            return user
-
-        serializer = UserSerializer(user, data=request.data, partial=partial)
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
 
         if not serializer.is_valid():
             return Response(
-                {"error": "Invalid user data", "details": serializer.errors},
+                serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -125,39 +84,7 @@ class AccountManagementView(APIView):
         return Response(
             {
                 "message": "Account updated successfully",
-                "user": serializer.data,
-            }
+                "profile": serializer.data,
+            },
+            status=status.HTTP_200_OK,
         )
-
-    def _get_target_user(self, request, user_id):
-        """
-        Get the target user for account actions.
-
-        - If `user_id` is None or matches current user, return self.
-        - Staff users can manage other users (add permission check as needed).
-
-        Returns:
-            User object or error Response.
-        """
-        if not user_id or str(user_id) == str(request.user.id):
-            return request.user
-
-        try:
-            return get_object_or_404(User, id=user_id)
-        except Exception:
-            return Response(
-                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-    def _get_user_profile_data(self, user):
-        """
-        Get serialized profile data for user.
-
-        Args:
-            user (User): User instance.
-
-        Returns:
-            Dict: Serialized profile data.
-        """
-        serializer = UserSerializer(user)
-        return serializer.data

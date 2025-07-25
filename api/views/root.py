@@ -44,19 +44,19 @@ def api_root(request, format=None):
                 "logout": safe_reverse("v1:api_logout"),
                 "register": safe_reverse("v1:api_register"),
                 "token": {
-                    "obtain": safe_reverse("v1:token_obtain_pair"),
-                    "refresh": safe_reverse("v1:token_refresh"),
+                    "obtain": safe_reverse("v1:api_token_obtain_pair"),
+                    "refresh": safe_reverse("v1:api_token_refresh"),
                 },
                 "social_login": {
-                    "google": safe_reverse("v1:google_login"),
+                    "google": safe_reverse("v1:api_google_login"),
                 },
                 "email_verification": {
-                    "verify": safe_reverse("v1:rest_verify_email"),
-                    "resend": safe_reverse("v1:rest_resend_email"),
+                    "verify": safe_reverse("v1:api_verify_email"),
+                    "resend": safe_reverse("v1:api_resend_email"),
                 },
                 "password_reset": {
-                    "request": safe_reverse("v1:rest_password_reset"),
-                    "confirm": safe_reverse("v1:rest_password_reset_confirm_api"),
+                    "request": safe_reverse("v1:api_password_reset"),
+                    "confirm": safe_reverse("v1:api_password_reset_confirm"),
                 },
             },
             "journal": {

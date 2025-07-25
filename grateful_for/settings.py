@@ -15,6 +15,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
 
 BASE_URL = (os.getenv("BASE_URL") or "http://localhost:8000").rstrip("/")
+FRONTEND_BASE_URL = (os.getenv("FRONTEND_BASE_URL") or "http://localhost:3000").rstrip("/")
+
+# In development, ensure BASE_URL uses http, as the dev server doesn't handle https.
+# This prevents issues with link generation when using tools like Postman
+# that might make requests over https.
+if os.getenv("DEBUG") == "True" and BASE_URL.startswith("https://"):
+    BASE_URL = "http" + BASE_URL[5:]
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
@@ -128,24 +136,6 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "access_key": os.getenv("B2_ACCESS_KEY_ID"),
-            "secret_key": os.getenv("B2_SECRET_ACCESS_KEY"),
-            "bucket_name": os.getenv("B2_STORAGE_BUCKET_NAME"),
-            "region_name": os.getenv("B2_S3_REGION_NAME"),
-            "custom_domain": f"{os.getenv('B2_STORAGE_BUCKET_NAME')}.s3.{os.getenv('B2_S3_REGION_NAME')}.amazonB2.com",
-            "file_overwrite": False,
-            "default_acl": None,
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
-
 REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
@@ -183,6 +173,7 @@ REST_AUTH = {
     "JWT_AUTH_REFRESH_COOKIE": "_refresh",
     "JWT_AUTH_HTTPONLY": False,
     "REGISTER_SERIALIZER": "api.serializers.CustomRegisterSerializer",
+    "PASSWORD_RESET_SERIALIZER": "api.serializers.CustomPasswordResetSerializer",
 }
 
 SIMPLE_JWT = {
@@ -198,6 +189,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
 ]
 
+ACCOUNT_ADAPTER = "api.adapters.CustomAccountAdapter"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_METHODS = {"email"}
@@ -226,8 +218,8 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
-EMAIL_CONFIRM_REDIRECT_BASE_URL = f"{BASE_URL}/auth/email/confirm/"
-PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = f"{BASE_URL}/auth/password/reset/confirm/"
+EMAIL_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/email/confirm/"
+PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/password/reset/confirm/"
 GOOGLE_CALLBACK_URL = f"{BASE_URL}/api/v1/auth/google/callback/"
 
 LOGGING = {
@@ -265,11 +257,12 @@ STORAGES = {
             "bucket_name": os.getenv("B2_STORAGE_BUCKET_NAME"),
             "region_name": os.getenv("B2_S3_REGION_NAME"),
             "endpoint_url": os.getenv("B2_ENDPOINT_URL"),
+            "custom_domain": f"{os.getenv('B2_STORAGE_BUCKET_NAME')}.s3.{os.getenv('B2_S3_REGION_NAME')}.backblazeb2.com",
             "file_overwrite": False,
             "default_acl": None,
         },
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
