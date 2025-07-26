@@ -174,3 +174,4 @@ env/
 .vscode/
 *.swp
 
+build.log

@@ -179,3 +179,4 @@ models_erd.dot
 models_erd.png
 staticfiles/
 templates/
+build.log

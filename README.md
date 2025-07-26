@@ -22,8 +22,59 @@ This project provides the backend services for "Grateful For". It allows users t
 - Python 3.11+
 - Django 5+
 - A PostgreSQL database is recommended for production.
+- Docker and Docker Compose (for containerized setup)
 
 ## Setup and Installation
+
+You can set up the project using Docker (recommended for ease of use and consistency) or manually.
+
+### Using Docker (Recommended)
+
+This project is configured to run with Docker and Docker Compose for a streamlined development setup.
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/theolujay/grateful_for
+    cd grateful_for
+    ```
+
+2.  **Configure environment variables:**
+    Create a `.env` file in the project root. This file is used by Docker Compose to configure the application container.
+    ```env
+    SECRET_KEY='your-super-secret-key'
+    DEBUG=True # Set to False in production
+    DATABASE_URL='postgres://user:password@host.docker.internal:5432/dbname' # Point this to your PostgreSQL instance
+    EMAIL_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/email/confirm/' # Note the trailing slash
+    PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/password/reset/confirm/' # Note the trailing slash
+    # ... other settings for email, Google OAuth, etc.
+    ```
+    **Note:** The provided `docker-compose.yml` does not include a database service. You will need a running PostgreSQL database accessible from the Docker container. On Docker Desktop (Mac/Windows), `host.docker.internal` can be used to connect to a service on your host machine. If you add a database service (e.g., named `db`) to `docker-compose.yml`, change the host in `DATABASE_URL` to `db`.
+
+3.  **Build and run with Docker Compose:**
+    ```bash
+    docker-compose up --build -d
+    ```
+    The `-d` flag runs the containers in detached mode. The application will be available at `http://127.0.0.1:8000/`.
+
+4.  **Run database migrations:**
+    The `entrypoint.sh` script does not automatically run migrations. Once the container is running, open a new terminal and run them manually:
+    ```bash
+    docker-compose exec web python manage.py migrate
+    ```
+
+5.  **Create a superuser:**
+    To create a superuser for admin access, run the following command:
+    ```bash
+    docker-compose exec web python manage.py createsuperuser
+    ```
+
+6.  **Stopping the application:**
+    To stop the containers, run:
+    ```bash
+    docker-compose down
+    ```
+
+### Manual Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -34,27 +85,13 @@ This project provides the backend services for "Grateful For". It allows users t
 2.  **Create and activate a virtual environment:**
     ```bash
     python -m venv .venv
-    # On macOS/Linux
-    source .venv/bin/activate
-    # On Windows
-    .venv\Scripts\activate
+    # On macOS/Linux: source .venv/bin/activate
+    # On Windows: .venv\Scripts\activate
     ```
 
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+3.  **Install dependencies:** `pip install -r requirements.txt`
 
-4.  **Configure environment variables:**
-    Create a `.env` file in the project root. This file should contain sensitive information and environment-specific settings. Refer to `settings.py` for all required variables.
-    ```env
-    SECRET_KEY='your-super-secret-key'
-    DEBUG=True # Set to False in production
-    DATABASE_URL='postgres://user:password@host:port/dbname' # Or sqlite:///db.sqlite3 for local dev
-    EMAIL_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/email/confirm/' # Note the trailing slash
-    PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/password/reset/confirm/' # Note the trailing slash
-    # ... other settings for email, Google OAuth, etc.
-    ```
+4.  **Configure environment variables:** Create a `.env` file as shown in the Docker setup, but point `DATABASE_URL` to your local database instance (e.g., `postgres://user:password@localhost:5432/dbname` or `sqlite:///db.sqlite3` for local development).
 
 5.  **Run database migrations:**
     ```bash
@@ -62,7 +99,7 @@ This project provides the backend services for "Grateful For". It allows users t
     python manage.py migrate
     ```
 
-6.  **Create a superuser (for admin access):**
+6.  **Create a superuser:**
     ```bash
     python manage.py createsuperuser
     ```
