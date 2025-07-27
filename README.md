@@ -1,5 +1,9 @@
 # Grateful For API
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
 A RESTful API for a digital journaling application designed to encourage gratitude and mindful reflection.
 
 ## Overview
@@ -16,6 +20,16 @@ This project provides the backend services for "Grateful For". It allows users t
 - **Community Feed**: Anonymized, randomized feed of public journal entries from the community.
 - **User Profiles**: Manage user account information and view a personal dashboard.
 - **Security**: Includes rate limiting on login attempts to prevent brute-force attacks.
+
+## Tech Stack
+
+- **Backend**: Django, Django REST Framework
+- **Database**: PostgreSQL (recommended)
+- **Authentication**: JSON Web Tokens (JWT), Google OAuth2
+- **Containerization**: Docker, Docker Compose
+- **API Documentation**: Swagger (drf-yasg) / ReDoc / Hand-written
+
+---
 
 ## Prerequisites
 
@@ -48,7 +62,7 @@ This project is configured to run with Docker and Docker Compose for a streamlin
     PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/password/reset/confirm/' # Note the trailing slash
     # ... other settings for email, Google OAuth, etc.
     ```
-    **Note:** The provided `docker-compose.yml` does not include a database service. You will need a running PostgreSQL database accessible from the Docker container. On Docker Desktop (Mac/Windows), `host.docker.internal` can be used to connect to a service on your host machine. If you add a database service (e.g., named `db`) to `docker-compose.yml`, change the host in `DATABASE_URL` to `db`.
+    **Note:** For a fully containerized setup, you can add a PostgreSQL service to your `docker-compose.yml`. If you do, change the host in `DATABASE_URL` from `host.docker.internal` to the name of your database service (e.g., `db`).
 
 3.  **Build and run with Docker Compose:**
     ```bash
@@ -57,7 +71,7 @@ This project is configured to run with Docker and Docker Compose for a streamlin
     The `-d` flag runs the containers in detached mode. The application will be available at `http://127.0.0.1:8000/`.
 
 4.  **Run database migrations:**
-    The `entrypoint.sh` script does not automatically run migrations. Once the container is running, open a new terminal and run them manually:
+    If your `entrypoint.sh` script does not automatically run migrations, you may need to run them manually. Once the container is running, open a new terminal and run:
     ```bash
     docker-compose exec web python manage.py migrate
     ```
@@ -189,10 +203,13 @@ We aim to respond to support requests within 48 hours.
 -   Core features for user management, journaling, and community interaction.
 
 <!-- ## Running Tests
-
 *(This section can be filled out once tests are added to the project.)*
 
 ```bash
 # Example command
-python manage.py test
+pytest
 ``` -->
+
+## Contributing
+
+Contributions are welcome! Please see our Contributing Guide for more details on how to set up your development environment, run tests, and submit pull requests.
