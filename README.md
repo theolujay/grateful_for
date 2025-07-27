@@ -202,13 +202,13 @@ We aim to respond to support requests within 48 hours.
 -   Initial public release of the API.
 -   Core features for user management, journaling, and community interaction.
 
-<!-- ## Running Tests
-*(This section can be filled out once tests are added to the project.)*
+## Running Tests
+
+To run the automated tests for the project, use `pytest`. You can run the tests inside the Docker container after ensuring all dependencies from `requirements.txt` are installed:
 
 ```bash
-# Example command
-pytest
-``` -->
+docker-compose exec web pytest
+```
 
 ## Contributing
 
