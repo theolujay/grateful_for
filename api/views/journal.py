@@ -108,7 +108,8 @@ def entry_analytics(request):
     stats = JournalEntry.objects.filter(user=user).aggregate(
         total_entries=models.Count("id"),
         entries_this_month=models.Count(
-            "id", filter=models.Q(created_at__year=today.year, created_at__month=today.month)
+            "id",
+            filter=models.Q(created_at__year=today.year, created_at__month=today.month),
         ),
         entries_today=models.Count("id", filter=models.Q(created_at__date=today)),
     )

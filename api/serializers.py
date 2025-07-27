@@ -7,7 +7,9 @@ from django.db import transaction
 
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from dj_rest_auth.serializers import PasswordResetSerializer as BasePasswordResetSerializer
+from dj_rest_auth.serializers import (
+    PasswordResetSerializer as BasePasswordResetSerializer,
+)
 from allauth.account.utils import user_pk_to_url_str
 
 from grateful_for import settings

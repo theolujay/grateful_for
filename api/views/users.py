@@ -1,6 +1,7 @@
 """
 Dashboard and account management views for users.
 """
+
 from django.contrib.auth import get_user_model
 
 from rest_framework.parsers import MultiPartParser, FormParser

@@ -8,7 +8,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
-import dj_database_url # type:ignore
+import dj_database_url  # type:ignore
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,7 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(dotenv_path=str(BASE_DIR / ".env"))
 
 BASE_URL = (os.getenv("BASE_URL") or "http://localhost:8000").rstrip("/")
-FRONTEND_BASE_URL = (os.getenv("FRONTEND_BASE_URL") or "http://localhost:3000").rstrip("/")
+FRONTEND_BASE_URL = (os.getenv("FRONTEND_BASE_URL") or "http://localhost:3000").rstrip(
+    "/"
+)
 
 # In development, ensure BASE_URL uses http, as the dev server doesn't handle https.
 # This prevents issues with link generation when using tools like Postman
@@ -78,10 +80,10 @@ MIDDLEWARE = [
 ]
 
 DATABASES = {
-    'default': dj_database_url.config(
+    "default": dj_database_url.config(
         default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
-        conn_health_checks=True, 
+        conn_health_checks=True,
         ssl_require=True,
     )
 }
@@ -215,20 +217,26 @@ SOCIALACCOUNT_PROVIDERS = {
 # For development, you can use the console backend to see emails in the terminal:
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"  # Use SMTP for real emails
-EMAIL_HOST=os.getenv("EMAIL_HOST")
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD=os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL=os.getenv("DEFAULT_FROM_EMAIL")
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"  # Use SMTP for real emails
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 # Ensure required SMTP settings are present if that backend is used
-if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend" and not all([EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD]):
+if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend" and not all(
+    [EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD]
+):
     raise ImproperlyConfigured(
         "When using the SMTP email backend, you must set EMAIL_HOST, EMAIL_HOST_USER, and EMAIL_HOST_PASSWORD in your .env file."
     )
 EMAIL_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/email/confirm/"
-PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/password/reset/confirm/"
+PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = (
+    f"{FRONTEND_BASE_URL}/auth/password/reset/confirm/"
+)
 GOOGLE_CALLBACK_URL = f"{BASE_URL}/api/v1/auth/google/callback/"
 
 LOGGING = {
