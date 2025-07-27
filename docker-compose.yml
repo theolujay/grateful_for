@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     build: .
-    command: gunicorn grateful_for.wsgi:application --bind 0.0.0.0:8000
+    command: /home/app/web/entrypoint.sh
     volumes:
       - ./media:/home/app/web/media
       - ./static:/home/app/web/static
@@ -11,3 +11,21 @@ services:
       - "8000:8000"
     env_file:
       - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:17.5-bookworm
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB=${POSTGRES_DB}
+      POSTGRES_USER=${POSTGRES_USER}
+      POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres_data:

@@ -81,6 +81,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
+        conn_health_checks=True, 
         ssl_require=True,
     )
 }
@@ -260,12 +261,12 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
         "OPTIONS": {
-            "access_key": os.getenv("B2_ACCESS_KEY_ID"),
-            "secret_key": os.getenv("B2_SECRET_ACCESS_KEY"),
-            "bucket_name": os.getenv("B2_STORAGE_BUCKET_NAME"),
-            "region_name": os.getenv("B2_S3_REGION_NAME"),
-            "endpoint_url": os.getenv("B2_ENDPOINT_URL"),
-            "custom_domain": f"{os.getenv('B2_STORAGE_BUCKET_NAME')}.s3.{os.getenv('B2_S3_REGION_NAME')}.backblazeb2.com",
+            "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+            "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "bucket_name": os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            "region_name": os.getenv("AWS_S3_REGION_NAME"),
+            "endpoint_url": os.getenv("AWS_ENDPOINT_URL"),
+            "custom_domain": f"{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.{os.getenv('AWS_S3_REGION_NAME')}.backblazeb2.com",
             "file_overwrite": False,
             "default_acl": None,
         },

@@ -53,36 +53,36 @@ This project is configured to run with Docker and Docker Compose for a streamlin
     ```
 
 2.  **Configure environment variables:**
-    Create a `.env` file in the project root. This file is used by Docker Compose to configure the application container.
+    Create a `.env` file in the project root by copying the `example.env` template. This file is used by Docker Compose to configure the application and database containers.
     ```env
     SECRET_KEY='your-super-secret-key'
     DEBUG=True # Set to False in production
-    DATABASE_URL='postgres://user:password@host.docker.internal:5432/dbname' # Point this to your PostgreSQL instance
+
+    # PostgreSQL settings for Docker Compose
+    POSTGRES_DB=grateful_for_db
+    POSTGRES_USER=grateful_for_user
+    POSTGRES_PASSWORD=a_secure_password
+    DATABASE_URL='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}'
+
+    # Frontend Redirect URLs
     EMAIL_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/email/confirm/' # Note the trailing slash
     PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL='http://localhost:3000/auth/password/reset/confirm/' # Note the trailing slash
     # ... other settings for email, Google OAuth, etc.
     ```
-    **Note:** For a fully containerized setup, you can add a PostgreSQL service to your `docker-compose.yml`. If you do, change the host in `DATABASE_URL` from `host.docker.internal` to the name of your database service (e.g., `db`).
 
 3.  **Build and run with Docker Compose:**
     ```bash
     docker-compose up --build -d
     ```
-    The `-d` flag runs the containers in detached mode. The application will be available at `http://127.0.0.1:8000/`.
+    The `-d` flag runs the containers in detached mode. The `entrypoint.sh` script will automatically run database migrations. The application will be available at `http://127.0.0.1:8000/`.
 
-4.  **Run database migrations:**
-    If your `entrypoint.sh` script does not automatically run migrations, you may need to run them manually. Once the container is running, open a new terminal and run:
-    ```bash
-    docker-compose exec web python manage.py migrate
-    ```
-
-5.  **Create a superuser:**
+4.  **Create a superuser (Optional):**
     To create a superuser for admin access, run the following command:
     ```bash
     docker-compose exec web python manage.py createsuperuser
     ```
 
-6.  **Stopping the application:**
+5.  **Stopping the application:**
     To stop the containers, run:
     ```bash
     docker-compose down
