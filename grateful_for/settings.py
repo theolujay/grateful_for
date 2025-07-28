@@ -233,11 +233,19 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend" and not all(
     raise ImproperlyConfigured(
         "When using the SMTP email backend, you must set EMAIL_HOST, EMAIL_HOST_USER, and EMAIL_HOST_PASSWORD in your .env file."
     )
-EMAIL_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/auth/email/confirm/"
+EMAIL_CONFIRM_REDIRECT_BASE_URL = f"{FRONTEND_BASE_URL}/email/confirm/"
 PASSWORD_RESET_CONFIRM_REDIRECT_BASE_URL = (
-    f"{FRONTEND_BASE_URL}/auth/password/reset/confirm/"
+    f"{FRONTEND_BASE_URL}/password/reset/confirm/"
 )
 GOOGLE_CALLBACK_URL = f"{BASE_URL}/api/v1/auth/google/callback/"
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+
 
 LOGGING = {
     "version": 1,
@@ -283,3 +291,4 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+

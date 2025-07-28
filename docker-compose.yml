@@ -3,6 +3,7 @@ services:
     build: .
     command: /home/app/web/entrypoint.sh
     volumes:
+      - .:/home/app/web
       - ./media:/home/app/web/media
       - ./static:/home/app/web/static
     ports:
@@ -12,6 +13,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
   db:
     image: postgres:17.5-bookworm
     volumes:
@@ -25,5 +29,25 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:8-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  celery_worker:
+    build: .
+    command: celery -A grateful_for worker -l info
+    volumes:
+      - .:/home/app/web
+    env_file:
+      - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 volumes:
   postgres_data:

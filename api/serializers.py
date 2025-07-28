@@ -6,18 +6,21 @@ from django.urls import reverse
 from django.db import transaction
 
 from rest_framework import serializers
-from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.registration.serializers import (
+    RegisterSerializer as BaseRegisterSerializer,
+)
 from dj_rest_auth.serializers import (
     PasswordResetSerializer as BasePasswordResetSerializer,
 )
-from allauth.account.utils import user_pk_to_url_str
-
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import setup_user_email, user_pk_to_url_str
 from grateful_for import settings
 
 from .models import (
     CustomUser,
     JournalEntry,
 )
+from .tasks import send_verification_email_task
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -79,7 +82,7 @@ class JournalEntryListSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at")
 
 
-class CustomRegisterSerializer(RegisterSerializer):
+class CustomRegisterSerializer(BaseRegisterSerializer):
     """Serializer for user registration with custom fields, extending dj-rest-auth."""
 
     username = None
@@ -97,13 +100,30 @@ class CustomRegisterSerializer(RegisterSerializer):
 
     @transaction.atomic
     def save(self, request):
-        user = super().save(request)
+        # We override the save method to prevent the default synchronous email sending.
+        # Instead, we replicate the user creation logic from allauth and then
+        # dispatch our asynchronous Celery task.
+        adapter = get_adapter()
+        user = adapter.new_user(request)
+        self.cleaned_data = self.get_cleaned_data()
+
+        # This populates the user instance with basic fields like email
+        adapter.save_user(request, user, self)
+
+        # Now, we add our custom fields
         user.first_name = self.validated_data.get("first_name", user.first_name)
         user.phone = self.validated_data.get("phone", user.phone)
         user.date_of_birth = self.validated_data.get(
             "date_of_birth", user.date_of_birth
         )
         user.save()
+
+        # Create the EmailAddress record required by allauth
+        setup_user_email(request, user, [])
+
+        # Trigger the background task to send the verification email
+        send_verification_email_task.delay(user.id)
+
         return user
 
 
