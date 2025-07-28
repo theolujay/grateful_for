@@ -2,6 +2,7 @@
 Django settings for grateful_for project.
 """
 
+import sys
 from django.core.exceptions import ImproperlyConfigured
 import os
 from datetime import timedelta
@@ -88,6 +89,11 @@ DATABASES = {
     )
 }
 
+if "test" in sys.argv or "pytest" in sys.argv[0]:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+    }
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",

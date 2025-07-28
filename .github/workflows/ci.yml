@@ -24,7 +24,7 @@ jobs:
         run: chmod +x entrypoint.sh
 
       - name: Build and run containers
-        run: docker compose -f docker-compose.yml -f .github/docker-compose.ci.yml up --build -d web db
+        run: docker compose -f docker-compose.yml -f .github/docker-compose.ci.yml up --build -d web
 
       - name: Run tests
         run: docker compose exec web pytest
