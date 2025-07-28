@@ -27,4 +27,4 @@ jobs:
         run: docker compose -f docker-compose.yml -f .github/docker-compose.ci.yml up --build -d web
 
       - name: Run tests
-        run: docker compose exec web pytest
+        run: docker compose exec web bash -c "python manage.py migrate && pytest"

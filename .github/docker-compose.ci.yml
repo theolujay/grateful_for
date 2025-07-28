@@ -1,6 +1,8 @@
 # This file overrides the main docker-compose.yml for the CI environment.
 services:
   web:
-    # In CI, we use an in-memory SQLite database for tests, so the `web`
-    # service has no external dependencies. This saves significant memory.
+    # In CI, we override the default command to prevent Gunicorn from starting.
+    # This saves significant memory. The container is kept alive so we can
+    # exec into it to run migrations and tests.
+    command: tail -f /dev/null
     depends_on: {}
