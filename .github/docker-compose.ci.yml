@@ -1,0 +1,9 @@
+# This file overrides the main docker-compose.yml for the CI environment.
+services:
+  web:
+    # In CI, we don't need Redis to run the tests because Celery tasks are mocked.
+    # Removing this dependency prevents the Redis container from being started,
+    # which saves significant memory and avoids OOM errors.
+    depends_on:
+      db:
+        condition: service_healthy
