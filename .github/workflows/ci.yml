@@ -20,6 +20,9 @@ jobs:
       - name: Copy .env.example to .env
         run: cp example.env .env
 
+      - name: Make entrypoint executable
+        run: chmod +x entrypoint.sh
+
       - name: Build and run containers
         run: docker compose up --build -d
 
