@@ -24,7 +24,7 @@ jobs:
         run: chmod +x entrypoint.sh
 
       - name: Build and run containers
-        run: docker compose up --build -d
+        run: docker compose up --build -d web db redis
 
       - name: Run tests
         run: docker compose exec web pytest
