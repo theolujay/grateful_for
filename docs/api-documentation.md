@@ -5,13 +5,13 @@
 - [Overview](#overview)
 - [Base URL](#base-url)
 - [Authentication](#authentication)
-- [Rate Limiting](#rate-limiting)
-- [Error Handling](#error-handling)
 - [API Endpoints](#api-endpoints)
   - [Authentication Endpoints](#authentication-endpoints)
   - [Journal Endpoints](#journal-endpoints)
   - [Community Endpoints](#community-endpoints)
   - [User Endpoints](#user-endpoints)
+- [Rate Limiting](#rate-limiting)
+- [Error Handling](#error-handling)
 - [Versioning](#versioning)
 - [Interactive Documentation](#interactive-documentation)
 - [Support](#support)
@@ -47,98 +47,6 @@ Authorization: Bearer <your_access_token>
 ```
 
 When the access token expires, your application should use the `refresh` token with the `/auth/token/refresh/` endpoint to obtain a new pair of tokens without requiring the user to log in again.
-
----
-
-## Rate Limiting
-
-To protect the API from brute-force attacks, rate limiting is applied to certain endpoints, particularly those related to authentication.
-
--   **Login Attempts**: The `/auth/login/` endpoint is rate-limited. If a user makes too many login attempts in a short period from the same IP address, they will receive a `429 Too Many Requests` response. The current limit is 5 attempts per minute.
-
-Please handle this response gracefully in your client by informing the user and preventing further requests for a short duration.
-
----
-
-## Error Handling
-
-The API uses standard HTTP status codes to indicate the success or failure of a request. In case of an error, the response body will typically contain a JSON object with details about the error.
-
-### Common Error Response Formats
-
-For validation errors (`400 Bad Request`), the response will detail which fields are invalid.
-
-```json
-{
-  "field_name": [
-    "A list of errors specific to this field."
-  ]
-}
-```
-
-For other errors, a `detail` key is often provided.
-
-```json
-{
-  "detail": "A human-readable error message."
-}
-```
-
-### Common HTTP Status Codes
-
--   **`200 OK`**: The request was successful (for GET, PATCH).
--   **`201 Created`**: The resource was successfully created (for POST).
--   **`204 No Content`**: The request was successful, and there is no content to return (e.g., for a DELETE request).
--   **`400 Bad Request`**: The server could not process the request due to invalid syntax or missing parameters. The response body will contain details about the validation errors.
--   **`401 Unauthorized`**: The request requires user authentication, but the `Authorization` header is missing or contains an invalid token.
--   **`403 Forbidden`**: The authenticated user does not have the necessary permissions to perform the action (e.g., trying to modify another user's journal entry).
--   **`404 Not Found`**: The requested resource could not be found.
--   **`429 Too Many Requests`**: The user has sent too many requests in a given amount of time ("rate limiting").
--   **`500 Internal Server Error`**: An unexpected error occurred on the server.
----
-
-## Versioning
-
-The API is currently at version `v1`. All endpoints are prefixed with `/api/v1/`.
-
--   **Backwards Compatibility**: We strive to make only backwards-compatible changes, such as adding new endpoints or new optional properties to existing responses.
--   **Breaking Changes**: Any backwards-incompatible changes will result in a new API version (e.g., `/api/v2/`).
--   **Deprecation**: Deprecated endpoints will be supported for at least 6 months after a new version is released.
-
----
-
-## Interactive Documentation
-
-You can explore the API interactively using the built-in documentation interfaces when the server is running:
-
--   **Swagger UI**: `/swagger/`
--   **ReDoc**: `/redoc/`
-
-For example, on a local development server, you would visit `http://127.0.0.1:8000/swagger/`.
-
----
-
-## Support
-
-For technical support, questions, or feedback:
-
--   **Email:** `olujay.dev@gmail.com`
--   **Discord:** `@olujay`
-
-We aim to respond to support requests within 48 hours.
-
----
-
-## Changelog
-
-### Version 1.0.0 (Current)
-
--   Initial public release of the API.
--   Core features for user management, journaling, and community interaction.
-
----
-
-_Last Updated: July 2025_
 
 ---
 
@@ -878,3 +786,95 @@ Retrieves or updates the authenticated user's account information.
   Occurs when the request body is invalid.
 
 ---
+
+---
+
+## Rate Limiting
+
+To protect the API from brute-force attacks, rate limiting is applied to certain endpoints, particularly those related to authentication.
+
+-   **Login Attempts**: The `/auth/login/` endpoint is rate-limited. If a user makes too many login attempts in a short period from the same IP address, they will receive a `429 Too Many Requests` response. The current limit is 5 attempts per minute.
+
+Please handle this response gracefully in your client by informing the user and preventing further requests for a short duration.
+
+---
+
+## Error Handling
+
+The API uses standard HTTP status codes to indicate the success or failure of a request. In case of an error, the response body will typically contain a JSON object with details about the error.
+
+### Common Error Response Formats
+
+For validation errors (`400 Bad Request`), the response will detail which fields are invalid.
+
+```json
+{
+  "field_name": [
+    "A list of errors specific to this field."
+  ]
+}
+```
+
+For other errors, a `detail` key is often provided.
+
+```json
+{
+  "detail": "A human-readable error message."
+}
+```
+
+### Common HTTP Status Codes
+
+-   **`200 OK`**: The request was successful (for GET, PATCH).
+-   **`201 Created`**: The resource was successfully created (for POST).
+-   **`204 No Content`**: The request was successful, and there is no content to return (e.g., for a DELETE request).
+-   **`400 Bad Request`**: The server could not process the request due to invalid syntax or missing parameters. The response body will contain details about the validation errors.
+-   **`401 Unauthorized`**: The request requires user authentication, but the `Authorization` header is missing or contains an invalid token.
+-   **`403 Forbidden`**: The authenticated user does not have the necessary permissions to perform the action (e.g., trying to modify another user's journal entry).
+-   **`404 Not Found`**: The requested resource could not be found.
+-   **`429 Too Many Requests`**: The user has sent too many requests in a given amount of time ("rate limiting").
+-   **`500 Internal Server Error`**: An unexpected error occurred on the server.
+---
+
+## Versioning
+
+The API is currently at version `v1`. All endpoints are prefixed with `/api/v1/`.
+
+-   **Backwards Compatibility**: We strive to make only backwards-compatible changes, such as adding new endpoints or new optional properties to existing responses.
+-   **Breaking Changes**: Any backwards-incompatible changes will result in a new API version (e.g., `/api/v2/`).
+-   **Deprecation**: Deprecated endpoints will be supported for at least 6 months after a new version is released.
+
+---
+
+## Interactive Documentation
+
+You can explore the API interactively using the built-in documentation interfaces when the server is running:
+
+-   **Swagger UI**: `/swagger/`
+-   **ReDoc**: `/redoc/`
+
+For example, on a local development server, you would visit `http://127.0.0.1:8000/swagger/`.
+
+---
+
+## Support
+
+For technical support, questions, or feedback:
+
+-   **Email:** `olujay.dev@gmail.com`
+-   **Discord:** `@olujay`
+
+We aim to respond to support requests within 48 hours.
+
+---
+
+## Changelog
+
+### Version 1.0.0 (Current)
+
+-   Initial public release of the API.
+-   Core features for user management, journaling, and community interaction.
+
+---
+
+_Last Updated: July 2025_
