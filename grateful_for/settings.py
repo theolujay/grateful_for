@@ -80,6 +80,8 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
+
+
 DATABASES = {
     "default": dj_database_url.config(
         default=os.getenv("DATABASE_URL"),
@@ -94,6 +96,7 @@ if "test" in sys.argv or "pytest" in sys.argv[0]:
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
     }
+    
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
