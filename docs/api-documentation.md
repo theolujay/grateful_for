@@ -152,6 +152,8 @@ This collection of endpoints handles user registration, login, logout, and accou
 
 Creates a new user account. An email verification link will be sent to the provided email address.
 
+> **Note:** This process is asynchronous. The API will respond immediately, and the verification email will be sent in the background.
+
 - **Endpoint:** `POST /auth/registration/`
 - **Authentication:** None
 
