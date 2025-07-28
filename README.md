@@ -75,7 +75,7 @@ This project is configured to run with Docker and Docker Compose for a streamlin
 
 3.  **Build and run with Docker Compose:**
     ```bash
-    docker-compose up --build -d
+    docker compose up --build -d
     ```
     The `-d` flag runs the containers in detached mode. The `entrypoint.sh` script will automatically run database migrations. The application will be available at `http://127.0.0.1:8000/`.
 
@@ -87,13 +87,13 @@ This project is configured to run with Docker and Docker Compose for a streamlin
 5.  **Create a superuser (Optional):**
     To create a superuser for admin access, run the following command:
     ```bash
-    docker-compose exec web python manage.py createsuperuser
+    docker compose exec web python manage.py createsuperuser
     ```
 
 6.  **Stopping the application:**
     To stop the containers, run:
     ```bash
-    docker-compose down
+    docker compose down
     ```
 
 ### Manual Installation
@@ -143,7 +143,7 @@ Interactive documentation (Swagger/ReDoc) is also available when the server is r
 To run the automated tests for the project, use `pytest`. You can run the tests inside the Docker container after ensuring all dependencies from `requirements.txt` are installed:
 
 ```bash
-docker-compose exec web pytest
+docker compose exec web pytest
 ```
 
 ## Contributing
