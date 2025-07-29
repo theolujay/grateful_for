@@ -46,4 +46,5 @@ EXPOSE 8000
 
 # The container will start as root, and the entrypoint script
 # will use gosu to drop privileges to the 'app' user before running the server.
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["/home/app/web/entrypoint.sh"]
+CMD ["gunicorn", "grateful_for.wsgi:application", "--bind", "0.0.0.0:8000"]
