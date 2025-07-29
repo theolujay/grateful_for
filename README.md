@@ -73,24 +73,30 @@ This project is configured to run with Docker and Docker Compose for a streamlin
     # ... other settings for email, Google OAuth, etc.
     ```
 
-3.  **Build and run with Docker Compose:**
+3.  **Make the entrypoint script executable:**
+    The script that starts the application inside the container needs execute permissions. When you clone a repository, these permissions are not always preserved. Run this command in your terminal:
+    ```bash
+    chmod +x entrypoint.sh
+    ```
+
+4.  **Build and run with Docker Compose:**
     ```bash
     docker compose up --build -d
     ```
     The `-d` flag runs the containers in detached mode. The `entrypoint.sh` script will automatically run database migrations. The application will be available at `http://127.0.0.1:8000/`.
 
-4.  **Accessing Services:**
+5.  **Accessing Services:**
     -   **API**: `http://127.0.0.1:8000/api/v1/`
     -   **Admin**: `http://127.0.0.1:8000/admin/`
     -   **Flower (Task Monitoring)**: `http://localhost:5555/`
 
-5.  **Create a superuser (Optional):**
+6.  **Create a superuser (Optional):**
     To create a superuser for admin access, run the following command:
     ```bash
     docker compose exec web python manage.py createsuperuser
     ```
 
-6.  **Stopping the application:**
+7.  **Stopping the application:**
     To stop the containers, run:
     ```bash
     docker compose down

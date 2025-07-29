@@ -31,9 +31,7 @@ COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 WORKDIR /home/app/web
 
 COPY --chown=app:app . .
-
-COPY --chown=app:app entrypoint.sh .
-RUN chmod +x entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 USER app
 
