@@ -16,8 +16,14 @@ RUN pip install --no-cache-dir --retries 3 --timeout 60 -r requirements.txt
 FROM python:3.13-slim-bookworm
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libpq5 && \
+    # Install curl to fetch gosu, and libpq5 for postgres connectivity
+    apt-get install -y --no-install-recommends libpq5 curl && \
     rm -rf /var/lib/apt/lists/*
+
+# Install gosu for easy privilege dropping
+RUN set -eux; \
+    curl -o /usr/local/bin/gosu -sL "https://github.com/tianon/gosu/releases/download/1.17/gosu-$(dpkg --print-architecture)"; \
+    chmod +x /usr/local/bin/gosu
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -33,11 +39,11 @@ WORKDIR /home/app/web
 COPY --chown=app:app . .
 RUN chmod +x ./entrypoint.sh
 
-USER app
-
 # Note: collectstatic moved to runtime via entrypoint script
 # because it requires DATABASE_URL and SECRET_KEY environment variables
 
 EXPOSE 8000
 
+# The container will start as root, and the entrypoint script
+# will use gosu to drop privileges to the 'app' user before running the server.
 CMD ["./entrypoint.sh"]
