@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    image: grateful_for:1.0
     # The command is now defined by the CMD in the Dockerfile.
     volumes:
       - .:/home/app/web
